@@ -131,4 +131,27 @@ export class PostService {
 
     return post;
   }
+
+  async getAllMarkers() {
+    try {
+      // 특정 칼럼만 갖어오는 Select
+      const markers = await this.postRepository
+        .createQueryBuilder('post')
+        .select([
+          'post.id',
+          'post.latitude',
+          'post.longitude',
+          'post.color',
+          'post.score',
+        ])
+        .getMany();
+
+      return markers;
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerErrorException(
+        '마커를 가져오는 도중 에러가 발생했습니다.',
+      );
+    }
+  }
 }
