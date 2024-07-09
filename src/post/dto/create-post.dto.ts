@@ -1,5 +1,11 @@
 import { MarkerColor } from '../marker-color.enum';
-import { IsArray, IsDateString, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import {
+  IsArray,
+  IsDateString,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 
 export class CreatePostDto {
   @IsNotEmpty()

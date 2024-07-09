@@ -17,7 +17,9 @@ export class PostService {
 
   async getPosts(page: number) {
     const perPage = 10;
+    console.log(page);
     const offset = (page - 1) * perPage;
+
     return this.postRepository
       .createQueryBuilder('post')
       .orderBy('post.date', 'DESC')
