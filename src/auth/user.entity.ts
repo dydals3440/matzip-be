@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { MarkerColor } from '../post/marker-color.enum';
 import { Post } from '../post/post.entity';
+import { Favorite } from '../favorite/favorite.entity';
 
 @Entity()
 // 사용자마다 이메일이 달라야 하므로.
@@ -66,4 +67,7 @@ export class User extends BaseEntity {
   // eager 옵션은 관계되어 있는 데이터를 함께 가져올 수 있음.
   @OneToMany(() => Post, (post) => post.user, { eager: false })
   post: Post[];
+
+  @OneToMany(() => Favorite, (favorite) => favorite.user)
+  favorites: Favorite[];
 }

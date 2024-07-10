@@ -13,6 +13,7 @@ import { MarkerColor } from './marker-color.enum';
 import { ColumnNumericTransformer } from '../@common/transformers/numeric.transformer';
 import { User } from '../auth/user.entity';
 import { Image } from '../image/image.entity';
+import { Favorite } from '../favorite/favorite.entity';
 
 @Entity()
 export class Post extends BaseEntity {
@@ -62,4 +63,7 @@ export class Post extends BaseEntity {
 
   @OneToMany(() => Image, (image) => image.post)
   images: Image[];
+
+  @OneToMany(() => Favorite, (favorite) => favorite.post)
+  favorites: Favorite[];
 }
