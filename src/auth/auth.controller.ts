@@ -133,4 +133,24 @@ export class AuthController {
   ) {
     return this.authService.updateCategory(categories, user);
   }
+
+  // 카카오 로그인
+  // 클라이언트에서 토큰을줌, 이걸 기반으로 백엔드에서 로그인 구현.
+  @Post('/oauth/kakao')
+  kakaoLogin(@Body() kakaoToken: { token: string }) {
+    return this.authService.kakaoLogin(kakaoToken);
+  }
+
+  // 애플 로그인
+  @Post('/oauth/apple')
+  appleLogin(
+    @Body()
+    appleIdentity: {
+      identityToken: string;
+      appId: string;
+      nickname: string | null;
+    },
+  ) {
+    return this.authService.appleLogin(appleIdentity);
+  }
 }
