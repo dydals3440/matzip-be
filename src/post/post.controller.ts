@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Patch,
@@ -17,10 +19,16 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../@common/@decorators/get-user.decorator';
 import { User } from '../auth/user.entity';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { GenericApiResponse } from '../@common/@decorators/generic-api-response-decorator';
+import { LoginSuccessDto } from '../auth/dto/login-success-dto';
 
 @Controller()
 // 모든 요청에 토큰이 필요함.
 @UseGuards(AuthGuard())
+@ApiTags('posts')
+// 자물쇠로 잠구자
+@ApiBearerAuth()
 export class PostController {
   constructor(private postService: PostService) {}
 
@@ -30,6 +38,17 @@ export class PostController {
   }
 
   @Get('/posts/my')
+  @HttpCode(HttpStatus.OK)
+  // @ApiOkResponse({
+  //   type: CreatePostDto,
+  //   isArray: true,
+  // })
+  @GenericApiResponse({
+    model: CreatePostDto,
+    isArray: true,
+    description: '## 성공적으로 Post 목록을 모두 가져왔습니다.',
+    statusCode: 200,
+  })
   getPosts(@Query('page') page: number, @GetUser() user: User) {
     return this.postService.getPosts(page, user);
   }
