@@ -52,10 +52,19 @@ export class PostService {
       const foundPost = await this.postRepository
         // post table에 있는 포스트
         .createQueryBuilder('post')
+        .leftJoinAndSelect('post.images', 'image')
+        // 포스트에서 개별 게시글을 가져올떄, 즐겨찾기 한 게시글인지 아닌지를 알 수 있음 이제.
+        // 이미지 테이블을 leftJoin을 통해 가져온 것 처럼, leftJoin을 통해 favorite 테이블도 가져옴.
+        .leftJoinAndSelect(
+          'post.favorites',
+          'favorite',
+          'favorite.userId = :userId',
+          { userId: user.id },
+        )
         .where('post.userId = :userId', { userId: user.id })
         // 어떤 포스트냐면
         // where를 이용하면, post.id가 인자로 받는 id와 같은 id를 찾을 것.
-        .andWhere('post.id = id', { id })
+        .andWhere('post.id = :id', { id })
         // getMany가 아닌 getOne()
         .getOne();
 
@@ -63,8 +72,17 @@ export class PostService {
         throw new NotFoundException('존재하지 않는 피드입니다.');
       }
 
-      return foundPost;
+      // 대신 favorite에 관련된 데이터를 모두 보낼 필요는 없음.
+      // console.log(foundPost);
+
+      // 그래서 아래와 같이 favorites 여부에 대한 정보를 전달함.
+      const { favorites, ...rest } = foundPost;
+      // Length > 0보다 크면,즐겨찾기를 한 게시글, 아니면 즐겨찾기를 하지 않은 게시글이다.
+      const postWithIsFavorites = { ...rest, isFavorite: favorites.length > 0 };
+      // console.log(postWithIsFavorites);
+      return postWithIsFavorites;
     } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException(
         '장소를 추가하는 도중 에러가 발생했습니다.',
       );
