@@ -5,12 +5,14 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { MarkerColor } from './marker-color.enum';
 import { ColumnNumericTransformer } from '../@common/transformers/numeric.transformer';
 import { User } from '../auth/user.entity';
+import { Image } from '../image/image.entity';
 
 @Entity()
 export class Post extends BaseEntity {
@@ -57,4 +59,7 @@ export class Post extends BaseEntity {
   // 반대로 여러개의 포스트가 한명의 유저에게 귀속되있음.
   @ManyToOne(() => User, (user) => user.post, { eager: false })
   user: User;
+
+  @OneToMany(() => Image, (image) => image.post)
+  images: Image[];
 }

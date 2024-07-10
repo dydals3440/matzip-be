@@ -8,26 +8,43 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './post.entity';
 import { Repository } from 'typeorm';
 import { User } from '../auth/user.entity';
+import { Image } from '../image/image.entity';
 
 @Injectable()
 export class PostService {
   constructor(
     @InjectRepository(Post)
     private postRepository: Repository<Post>,
+    @InjectRepository(Image)
+    private imageRepository: Repository<Image>,
   ) {}
+
+  // Image가 정렬이 안되어있음.
+  private getPostsWithOrderImage(posts: Post[]) {
+    return posts.map((post) => {
+      const { images, ...rest } = post;
+      const newImages = [...images].sort((a, b) => a.id - b.id);
+
+      return { ...rest, images: newImages };
+    });
+  }
 
   async getPosts(page: number, user: User) {
     const perPage = 10;
     console.log(page);
     const offset = (page - 1) * perPage;
 
-    return this.postRepository
+    const posts = await this.postRepository
       .createQueryBuilder('post')
+      // 이미지를 받아올떄, 이미지 배열을, post.images안에 넣어줌.
+      .leftJoinAndSelect('post.images', 'image')
       .where('post.userId = :userId', { userId: user.id })
       .orderBy('post.date', 'DESC')
       .take(perPage)
       .skip(offset)
       .getMany();
+
+    return this.getPostsWithOrderImage(posts);
   }
 
   async getPostById(id: number, user: User) {
@@ -64,6 +81,7 @@ export class PostService {
       title,
       description,
       date,
+      imageUris,
     } = createPostDto;
 
     const post = this.postRepository.create({
@@ -77,8 +95,11 @@ export class PostService {
       date,
       user,
     });
+    const images = imageUris.map((uri) => this.imageRepository.create(uri));
+    post.images = images;
 
     try {
+      await this.imageRepository.save(images);
       // save => DB 저장
       await this.postRepository.save(post);
     } catch (error) {
@@ -130,8 +151,12 @@ export class PostService {
     post.date = date;
     post.score = score;
 
+    const images = imageUris.map((uri) => this.imageRepository.create(uri));
+    post.images = images;
+
     // image module
     try {
+      await this.imageRepository.save(images);
       await this.postRepository.save(post);
     } catch (error) {
       console.log(error);

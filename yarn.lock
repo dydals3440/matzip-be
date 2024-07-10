@@ -1062,6 +1062,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@nestjs/serve-static@npm:^4.0.2":
+  version: 4.0.2
+  resolution: "@nestjs/serve-static@npm:4.0.2"
+  dependencies:
+    path-to-regexp: 0.2.5
+  peerDependencies:
+    "@fastify/static": ^6.5.0 || ^7.0.0
+    "@nestjs/common": ^9.0.0 || ^10.0.0
+    "@nestjs/core": ^9.0.0 || ^10.0.0
+    express: ^4.18.1
+    fastify: ^4.7.0
+  peerDependenciesMeta:
+    "@fastify/static":
+      optional: true
+    express:
+      optional: true
+    fastify:
+      optional: true
+  checksum: f424f804458b55330b4c4921daac6cec6cdc91d8182f3e71bf435f22fcfb12e893afd3e1422ff75a8ba93d7d1755a5e70007faf0cae6d38e142415ec4eb32c1f
+  languageName: node
+  linkType: hard
+
 "@nestjs/swagger@npm:^7.4.0":
   version: 7.4.0
   resolution: "@nestjs/swagger@npm:7.4.0"
@@ -1472,6 +1494,15 @@ __metadata:
   version: 1.3.5
   resolution: "@types/mime@npm:1.3.5"
   checksum: e29a5f9c4776f5229d84e525b7cd7dd960b51c30a0fb9a028c0821790b82fca9f672dab56561e2acd9e8eed51d431bde52eafdfef30f643586c4162f1aecfc78
+  languageName: node
+  linkType: hard
+
+"@types/multer@npm:^1.4.11":
+  version: 1.4.11
+  resolution: "@types/multer@npm:1.4.11"
+  dependencies:
+    "@types/express": "*"
+  checksum: 3d80b2acdfbc9f3e9027d4467e948925810b67e5622a3017f42f58a3598d34b25376890801e55d0c03973ccc34573abf5218af334e8292ec455832f4ade3e5f5
   languageName: node
   linkType: hard
 
@@ -2280,12 +2311,14 @@ __metadata:
     "@nestjs/passport": ^10.0.3
     "@nestjs/platform-express": ^10.0.0
     "@nestjs/schematics": ^10.0.0
+    "@nestjs/serve-static": ^4.0.2
     "@nestjs/swagger": ^7.4.0
     "@nestjs/testing": ^10.0.0
     "@nestjs/typeorm": ^10.0.2
     "@types/bcryptjs": ^2.4.6
     "@types/express": ^4.17.17
     "@types/jest": ^29.5.2
+    "@types/multer": ^1.4.11
     "@types/node": ^20.3.1
     "@types/passport-jwt": ^4.0.1
     "@types/supertest": ^6.0.0
@@ -5958,6 +5991,13 @@ __metadata:
   version: 0.1.7
   resolution: "path-to-regexp@npm:0.1.7"
   checksum: 69a14ea24db543e8b0f4353305c5eac6907917031340e5a8b37df688e52accd09e3cebfe1660b70d76b6bd89152f52183f28c74813dbf454ba1a01c82a38abce
+  languageName: node
+  linkType: hard
+
+"path-to-regexp@npm:0.2.5":
+  version: 0.2.5
+  resolution: "path-to-regexp@npm:0.2.5"
+  checksum: 44adcbd847d170786490de80d2abc4762d5e65cd8857f230b87bdff6ab1bd17a91baa201fea549954b4cbfd208ae021a3a4ebac19a69ebdf3fdc628c8344ad39
   languageName: node
   linkType: hard
 

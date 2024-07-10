@@ -104,7 +104,6 @@ export class AuthService {
   }
 
   async refreshToken(user: User) {
-    console.log('user', user);
     const { email } = user;
     const { accessToken, refreshToken } = await this.getTokens({ email });
 
