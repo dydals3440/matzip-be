@@ -6,7 +6,7 @@ import {
 import { CreatePostDto } from './dto/create-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './post.entity';
-import { Repository } from 'typeorm';
+import { Brackets, Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from '../auth/user.entity';
 import { Image } from '../image/image.entity';
 
@@ -27,6 +27,16 @@ export class PostService {
 
       return { ...rest, images: newImages };
     });
+  }
+
+  private async getPostsBaseQuery(
+    userId: number,
+  ): Promise<SelectQueryBuilder<Post>> {
+    return this.postRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.images', 'image')
+      .where('post.userId = :userId', { userId })
+      .orderBy('post.date', 'DESC');
   }
 
   async getPosts(page: number, user: User) {
@@ -208,5 +218,62 @@ export class PostService {
         '마커를 가져오는 도중 에러가 발생했습니다.',
       );
     }
+  }
+
+  async getPostsByMonth(year: number, month: number, user: User) {
+    const posts = await this.postRepository
+      .createQueryBuilder('post')
+      .where('post.userId = :userId', { userId: user.id })
+      .andWhere('extract(year from post.date) = :year', { year })
+      .andWhere('extract(month from post.date) = :month', { month })
+      .select([
+        'post.id AS id',
+        'post.title AS title',
+        'post.address AS address',
+        'EXTRACT(DAY FROM post.date) AS date',
+      ])
+      .getRawMany();
+    // getMany vs getRawMany
+    // getRawMany는 쿼리결과 직접 반환 (관계형 엔티티 그대로 가져올떄 사용)
+    // getMany 메서드는,Entity 객체를 반환. (쿼리 결과 그대로 가져오고 싶을 때 사용)
+
+    console.log(posts, '포스트데이터');
+
+    const groupPostsByDate = posts.reduce((acc, post) => {
+      const { id, title, address, date } = post;
+      console.log('acc', acc);
+
+      // 1:[{}] 1일은 어떤 데이터가 이는지 반환.
+      if (!acc[date]) {
+        acc[date] = [];
+      }
+      acc[date].push({ id, title, address });
+
+      return acc;
+    }, {});
+
+    return groupPostsByDate;
+  }
+
+  async searchMyPostsByTitleAndAddress(
+    query: string,
+    page: number,
+    user: User,
+  ) {
+    const perPage = 10;
+    const offset = (page - 1) * perPage;
+    const queryBuilder = await this.getPostsBaseQuery(user.id);
+    const posts = await queryBuilder
+      .andWhere(
+        new Brackets((qb) => {
+          qb.where('post.title like :query', { query: `%${query}%` });
+          qb.orWhere('post.address like :query', { query: `%${query}%` });
+        }),
+      )
+      .skip(offset)
+      .take(perPage)
+      .getMany();
+
+    return this.getPostsWithOrderImage(posts);
   }
 }

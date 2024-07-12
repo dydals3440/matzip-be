@@ -7,7 +7,6 @@ import {
   HttpStatus,
   Patch,
   Post,
-  Res,
   UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
@@ -24,7 +23,6 @@ import {
   ApiOperation,
   ApiResponse,
   ApiTags,
-  getSchemaPath,
 } from '@nestjs/swagger';
 import { LoginSuccessDto } from './dto/login-success-dto';
 import { ResponseDto } from './dto/generic-response.dto';
