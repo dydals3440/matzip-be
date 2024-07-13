@@ -19,9 +19,16 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from '../@common/@decorators/get-user.decorator';
 import { User } from '../auth/user.entity';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { GenericApiResponse } from '../@common/@decorators/generic-api-response-decorator';
-import { LoginSuccessDto } from '../auth/dto/login-success-dto';
+import {
+  ApiBearerAuth,
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+
+import { PostDto } from './dto/post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 @Controller()
 // 모든 요청에 토큰이 필요함.
@@ -32,6 +39,35 @@ import { LoginSuccessDto } from '../auth/dto/login-success-dto';
 export class PostController {
   constructor(private postService: PostService) {}
 
+  @HttpCode(HttpStatus.OK)
+  @ApiOkResponse({
+    description: '내 마커를 조회합니다.',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'number' },
+              latitude: { type: 'number' },
+              longitude: { type: 'number' },
+              color: {
+                type: 'string',
+                enum: ['RED', 'BLUE', 'YELLOW', 'GREEN', 'PURPLE'],
+              },
+              score: { type: 'number' },
+            },
+          },
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 500,
+    description: '마커를 가져오는 도중 에러가 발생했습니다.',
+  })
+  @ApiOperation({ summary: '마커를 가져옵니다.', description: '#마커 API' })
   @Get('/markers/my')
   getAllMarkers(@GetUser() user: User) {
     return this.postService.getAllMarkers(user);
@@ -39,37 +75,59 @@ export class PostController {
 
   @Get('/posts/my')
   @HttpCode(HttpStatus.OK)
-  // @ApiOkResponse({
-  //   type: CreatePostDto,
-  //   isArray: true,
-  // })
-  @GenericApiResponse({
-    model: CreatePostDto,
-    isArray: true,
-    description: '## 성공적으로 Post 목록을 모두 가져왔습니다.',
-    statusCode: 200,
+  @ApiOperation({
+    summary: '내가 쓴 게시글 조회.',
+    description: '#내가 쓴 게시글 조회 API',
   })
+  @ApiOkResponse({ status: 200, type: CreatePostDto })
   getPosts(@Query('page') page: number, @GetUser() user: User) {
     return this.postService.getPosts(page, user);
   }
 
+  @HttpCode(HttpStatus.OK)
   @Get('/posts/:id')
-  // Pipe를 사용해서, Id가 string으로와도, parseInt형태로 바꿀 수 있음.
+  @ApiOperation({
+    summary: '상세 게시글 조회.',
+    description: '#상세 게시글 조회 API',
+  })
+  @ApiOkResponse({ status: 200, type: PostDto })
   getPost(@Param('id', ParseIntPipe) id: number, @GetUser() user: User) {
     return this.postService.getPostById(id, user);
   }
 
   @Post('/posts')
+  @ApiOperation({
+    summary: '게시글 작성.',
+    description: '#게시글 작성 API',
+  })
   @UsePipes(ValidationPipe)
   createPost(@Body() createPostDto: CreatePostDto, @GetUser() user: User) {
     return this.postService.createPost(createPostDto, user);
   }
 
   @Delete('/posts/:id')
+  @ApiOperation({
+    summary: '게시글 삭제.',
+    description: '#게시글 삭제 API',
+  })
+  @ApiOkResponse({ status: 200, description: '성공적으로 삭제됨' })
+  @ApiResponse({ status: 404, description: '존재하지 않는 피드입니다.' })
+  @ApiResponse({
+    status: 500,
+    description: '삭제하는 도중 에러가 발생했습니다.',
+  })
   deletePost(@Param('id', ParseIntPipe) id: number, @GetUser() user: User) {
     return this.postService.deletePost(id, user);
   }
 
+  @ApiOkResponse({
+    status: 200,
+    type: UpdatePostDto,
+  })
+  @ApiOperation({
+    summary: '게시글 수정.',
+    description: '#게시글 수정 API',
+  })
   @Patch('/posts/:id')
   @UsePipes(ValidationPipe)
   updatePost(
@@ -81,6 +139,18 @@ export class PostController {
     return this.postService.updatePost(id, updatePostDto, user);
   }
 
+  @ApiOkResponse({
+    status: 200,
+    description:
+      '{ "일" : [{ "id": 8,\n' +
+      '            "title": "제목",\n' +
+      '            "address": "서울특별시 야호" }] }' +
+      '의 데이터 구조로 받습니다.',
+  })
+  @ApiOperation({
+    summary: '게시글 연/월을 통한 조회.',
+    description: '#게시글 날짜별 조회',
+  })
   @Get('/posts')
   getPostsByMonth(
     @Query('year') year: number,
@@ -90,6 +160,15 @@ export class PostController {
     return this.postService.getPostsByMonth(year, month, user);
   }
 
+  @ApiOkResponse({
+    status: 200,
+    isArray: true,
+    type: PostDto,
+  })
+  @ApiOperation({
+    summary: '게시글 검색.',
+    description: '#게시글 검색어 조회',
+  })
   @Get('/posts/my/search')
   searchMyPostsByTitleAndAddress(
     @Query('query') query: string,

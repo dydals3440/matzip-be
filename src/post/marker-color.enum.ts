@@ -5,3 +5,9 @@ export enum MarkerColor {
   GREEN = 'GREEN',
   PURPLE = 'PURPLE',
 }
+
+export enum LoginType {
+  EMAIL = 'email',
+  KAKAO = 'kakao',
+  APPLE = 'apple',
+}

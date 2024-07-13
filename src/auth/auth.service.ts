@@ -86,11 +86,7 @@ export class AuthService {
     // refreshToken 저장
     await this.updateHashedRefreshToken(user.id, refreshToken);
 
-    return {
-      message: '성공',
-      statusCode: 200,
-      data: { accessToken, refreshToken },
-    };
+    return { accessToken, refreshToken };
   }
 
   private async updateHashedRefreshToken(id: number, refreshToken: string) {

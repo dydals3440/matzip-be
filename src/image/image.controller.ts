@@ -13,6 +13,7 @@ import {
 } from '@nestjs/common';
 
 import { numbers } from 'src/@common/constants';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 try {
   fs.readdirSync('uploads');
@@ -22,6 +23,7 @@ try {
 }
 
 @Controller('image')
+@ApiTags('image')
 @UseGuards(AuthGuard())
 export class ImageController {
   @UseInterceptors(
@@ -39,6 +41,10 @@ export class ImageController {
     }),
   )
   @Post('/')
+  @ApiOperation({
+    summary: '이미지 Presigned URL 반환 API.',
+    description: '#Presigned Image Url API',
+  })
   uploadImages(@UploadedFiles() files: Express.Multer.File[]) {
     console.log(files);
     const uris = files.map((file) => file.filename);
