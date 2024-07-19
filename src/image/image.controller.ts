@@ -13,7 +13,7 @@ import {
 } from '@nestjs/common';
 
 import { numbers } from 'src/@common/constants';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 try {
   fs.readdirSync('uploads');
@@ -25,6 +25,7 @@ try {
 @Controller('image')
 @ApiTags('image')
 @UseGuards(AuthGuard())
+@ApiBearerAuth()
 export class ImageController {
   @UseInterceptors(
     FilesInterceptor('images', numbers.MAX_IMAGE_COUNT, {

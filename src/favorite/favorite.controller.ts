@@ -11,10 +11,11 @@ import { AuthGuard } from '@nestjs/passport';
 import { FavoriteService } from './favorite.service';
 import { User } from '../auth/user.entity';
 import { GetUser } from '../@common/@decorators/get-user.decorator';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 
 @Controller('favorites')
 @ApiTags('favorites')
+@ApiBearerAuth()
 @UseGuards(AuthGuard())
 export class FavoriteController {
   constructor(private favoriteService: FavoriteService) {}
