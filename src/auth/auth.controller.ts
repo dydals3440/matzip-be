@@ -23,6 +23,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiTags,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { LoginSuccessDto } from './dto/login-success-dto';
 import { ResponseDto } from './dto/generic-response.dto';
@@ -94,6 +95,7 @@ export class AuthController {
     description: 'Forbidden',
   })
   @Get('/refresh')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard())
   refresh(@GetUser() user: User) {
     return this.authService.refreshToken(user);
@@ -111,6 +113,7 @@ export class AuthController {
   // @GenericApiResponse({ model: MyInfoSuccessDto, isArray: true })
   @Get('/me')
   @UseGuards(AuthGuard())
+  @ApiBearerAuth()
   getProfile(@GetUser() user: User) {
     return this.authService.getProfile(user);
   }
@@ -125,6 +128,7 @@ export class AuthController {
   })
   @Patch('/me')
   @UseGuards(AuthGuard())
+  @ApiBearerAuth()
   editProfile(@Body() editProfileDto: EditProfileDto, @GetUser() user: User) {
     return this.authService.editProfile(editProfileDto, user);
   }
@@ -139,6 +143,7 @@ export class AuthController {
   })
   @Post('/logout')
   @UseGuards(AuthGuard())
+  @ApiBearerAuth()
   logout(@GetUser() user: User) {
     return this.authService.deleteRefreshToken(user);
   }
@@ -153,6 +158,7 @@ export class AuthController {
   })
   @Delete('/me')
   @UseGuards(AuthGuard())
+  @ApiBearerAuth()
   deleteAccount(@GetUser() user: User) {
     return this.authService.deleteAccount(user);
   }
@@ -181,6 +187,7 @@ export class AuthController {
   })
   @Patch('/category')
   @UseGuards(AuthGuard())
+  @ApiBearerAuth()
   updateCategory(
     @Body() categories: Record<keyof MarkerColor, string>,
     @GetUser() user: User,
